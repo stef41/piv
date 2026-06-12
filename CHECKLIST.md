@@ -4,7 +4,7 @@ Use this checklist when reporting a population-level mechanistic claim
 ("mechanism X causes behaviour Y"). Each item maps to a section of the PIV
 paper (ICML 2026 Hypothesis Testing Workshop).
 
-## Predict — predictive validity
+## Predict: predictive validity
 
 - [ ] **Pre-registration.** The quantitative prediction (certificate, score,
   threshold) was frozen *before* the test population was generated. The
@@ -12,7 +12,7 @@ paper (ICML 2026 Hypothesis Testing Workshop).
 - [ ] **Held-out cohort.** Evaluation on models never used during mechanism
   discovery or predictor development.
 - [ ] **Full operating characteristics.** Precision, recall, specificity,
-  balanced accuracy, AUROC — not precision alone (prevalence can make
+  balanced accuracy, AUROC. Not precision alone (prevalence can make
   precision uninformative).
 - [ ] **Baselines.** Always-positive, prevalence-matched random, and at least
   one simple single-feature baseline.
@@ -20,7 +20,7 @@ paper (ICML 2026 Hypothesis Testing Workshop).
 - [ ] **Alternative hypotheses.** ≥ 5 plausible alternative predictors tested
   and their failure documented, with multiple-comparison correction.
 
-## Intervene — causal necessity
+## Intervene: causal necessity
 
 - [ ] **Matched controls.** Every targeted intervention paired with (i) a
   random direction matched in norm and (ii) a matched-rank random
@@ -37,7 +37,7 @@ paper (ICML 2026 Hypothesis Testing Workshop).
 - [ ] **≥ 2 operators.** Agreement across weight surgery / activation
   ablation / LoRA counter-finetune is evidence against off-target confounds.
 
-## Validate — generality
+## Validate: generality
 
 - [ ] **OOD transfer of the claim.** The mechanism, identified in one regime,
   predicts behaviour in a regime never used during discovery

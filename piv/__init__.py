@@ -1,4 +1,4 @@
-"""PIV — Predict · Intervene · Validate.
+"""PIV: Predict, Intervene, Validate.
 
 Statistical utilities for validating mechanistic claims in neural networks.
 
