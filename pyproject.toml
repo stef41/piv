@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "piv-framework"
+version = "0.1.0"
+description = "PIV (Predict-Intervene-Validate): a statistical framework for mechanistic claims in neural networks"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Zacharie Bugaud", email = "zacharie@astera.org" }]
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Homepage = "https://github.com/stef41/piv"
+Paper = "https://openreview.net/forum?id=o8aRR9YuxE"
+
+[tool.setuptools]
+packages = ["piv"]
