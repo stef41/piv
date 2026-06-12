@@ -1,33 +1,39 @@
-"""Worked example: PIV on a synthetic population (~30 lines).
+"""Worked example: PIV on the Elman-RNN case study (~30 lines).
 
-Demonstrates the API end-to-end on synthetic data. The RNN case-study
-reproduction (real models + data) ships with the artifact release; see the
-"Artifact status" table in the README.
+Trains a small population, applies the pre-registered certificate blind,
+and runs one targeted surgery with matched controls.
+GPU: pass device="cuda". Full populations: scripts/run_all.py / `make all`.
 """
-import random
-
 import piv
+from piv.casestudy import (CERTIFICATE, certify, matched_controls,
+                           persistence, train_population, weight_surgery)
 
-rng = random.Random(42)
+device = "cpu"
 
-# --- Predict: pre-register a certificate, then evaluate blind ---------------
-certificate = {"score": "max_input_invariance", "threshold": 0.8}
-print("pre-registration:", piv.freeze(certificate))
+# --- Predict: pre-register, then evaluate blind ------------------------------
+print("frozen certificate:", piv.freeze(CERTIFICATE))
+dev_pop, _ = train_population(range(42, 52), k=3, H=8, epochs=2000,
+                              device=device)
+blind_pop, _ = train_population(range(200, 210), k=3, H=8, epochs=2000,
+                                device=device)
+pers = persistence(blind_pop, device=device)
+cert = certify(blind_pop, device=device)
+y = (pers >= 0.99)
+tp = int((cert["certified"] & y).sum())
+print(f"blind: {int(cert['certified'].sum())} certified, "
+      f"{tp} true positives, precision CI "
+      f"{piv.wilson_ci(tp, max(int(cert['certified'].sum()), 1))}")
 
-n = 300
-labels = [rng.random() < 0.96 for _ in range(n)]                  # generaliser?
-scores = [0.9 if y and rng.random() < 0.92 else 0.3 for y in labels]
-preds = [s >= certificate["threshold"] for s in scores]
-tp = sum(p and y for p, y in zip(preds, labels))
-print("precision CI:", piv.wilson_ci(tp, sum(preds)))
-print("n for r>=0.3:", piv.sample_size_correlation(0.3))           # 85
+# --- Intervene: targeted surgery vs matched controls -------------------------
+m = int(cert["certified"].nonzero()[0]) if cert["certified"].any() else 0
+d = int(cert["iv"][m].argmax())
+cut = persistence(weight_surgery(blind_pop, d), device=device)
+c1, c2 = matched_controls(blind_pop, d)
+print(f"surgery on tight dim {d} of model {m}: "
+      f"persistence {float(pers[m]):.3f} -> {float(cut[m]):.3f}; "
+      f"controls -> {float(persistence(c1, device=device)[m]):.3f}, "
+      f"{float(persistence(c2, device=device)[m]):.3f}")
 
-# --- Intervene: cluster-bootstrap null over models ---------------------------
-breaks_by_model = [[1] * 4 for _ in range(100)]                    # 393-ish breaks
-print("surgery p (cluster bootstrap):",
-      piv.cluster_bootstrap_p(breaks_by_model, null_rate=0.5))
-
-# --- Validate: over-dispersed OOD null ---------------------------------------
-print("OOD p (beta-binomial):", piv.beta_binomial_tail_p(160, 160, a=1.2, b=8.9))
-print()
-print(piv.checklist([True] * 8))
+# --- Validate: power analysis for the OOD stage ------------------------------
+print("models needed to detect 80% vs 0% OOD success:",
+      piv.sample_size_two_proportions(0.8, 0.0001))

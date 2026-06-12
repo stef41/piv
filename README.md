@@ -25,7 +25,8 @@ falsifiable stages:
 ## Install
 
 ```bash
-pip install git+https://github.com/stef41/piv
+pip install git+https://github.com/stef41/piv        # stdlib core
+pip install torch                                     # for piv.casestudy
 ```
 
 ```python
@@ -35,6 +36,21 @@ piv.wilson_ci(265, 271)                    # (0.952, 0.990)
 piv.sample_size_correlation(r=0.3)         # 85
 piv.freeze(my_certificate_dict)            # sha256 + timestamp pre-registration
 ```
+
+## Reproduce the case study
+
+```bash
+make pilot               # 10x-reduced smoke run, CPU
+make all DEVICE=cuda     # full populations from raw seeds (GPU)
+```
+
+`scripts/run_all.py` trains the dev (100), recipe (100), blind (300) and
+OOD k=12-25 (160) populations as batched tensor programs;
+`scripts/blind_baselines.py` produces the baselines table + ROC;
+`scripts/surgery.py` runs confound-controlled weight surgery with matched
+controls and the cluster-bootstrap null. The demo notebook
+(`notebooks/demo_blind_prediction.ipynb`) re-runs blind prediction on a
+single CPU in under 4 minutes.
 
 ## PIV reporting checklist
 
@@ -53,12 +69,20 @@ For mechanistic interpretability submissions (see `CHECKLIST.md`):
 
 | Artifact | Status |
 |---|---|
-| `piv` package (power analysis, CIs, pre-registration, nulls) | released (this repo) |
+| `piv` package (power analysis, CIs, pre-registration, nulls) | released |
+| `piv.casestudy` (Elman-RNN populations, certificate, surgery) | released |
 | PIV checklist | released (`CHECKLIST.md`) |
-| 300 held-out blind-prediction models | uploading (GitHub release) |
-| 160 OOD transfer models + JSON manifest | uploading (GitHub release) |
-| Demo notebook (blind prediction, <4 min CPU) | uploading |
-| `make all` reproduction target | uploading |
+| Demo notebook (blind prediction, <4 min CPU) | released (`notebooks/`) |
+| `make all` reproduction from raw seeds | released |
+| Frozen certificate | `certificate.json`, git tag `certificate-freeze` |
+| Blind-prediction models (300) + OOD models (160) + manifests | GitHub release `artifacts-v1` (regenerable via `make all`) |
+
+**Provenance note.** This repository is a from-scratch reimplementation of
+the paper's case study, released at camera-ready time; the git history
+(including the `certificate-freeze` tag) is dated accordingly. The
+certificate parameters are fixed by `certificate.json` before any artifact
+in the release was generated, and every population regenerates
+deterministically from the seed ranges in `scripts/run_all.py`.
 
 ## Citation
 

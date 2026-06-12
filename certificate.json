@@ -1,0 +1,15 @@
+{
+  "certificate": {
+    "score": "max_d IV(d)",
+    "iv_definition": "1 - mean_t Var_x(h_t[d] | post-detection) / Var_{x,t}(h_t[d] | all steps)",
+    "threshold_tau": 0.8,
+    "gap_epsilon": 0.2,
+    "tight_dim_rule": "IV(d) >= 1 - gap_epsilon",
+    "decision_rule": "certify iff max_d IV(d) >= threshold_tau",
+    "eval_batch": 512,
+    "eval_seq_len_factor": "5*(k-1), min 15"
+  },
+  "sha256": "e099c6171f16c384c5b6dad8a14d8caddde00f41f36120c145ee3ebe04af0bba",
+  "frozen_at_unix": 1781288242,
+  "frozen_at_iso": "2026-06-12T18:17:22Z"
+}
